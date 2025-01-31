@@ -1,0 +1,94 @@
+#For older docker compose versions the following line is required
+#version: '3.8'
+services:
+  eureka-server:
+    image: hurban/discovery-service:latest
+    environment:
+      - JAVA_TOOL_OPTIONS="-XX:-UseContainerSupport"
+    networks:
+      - app-network
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: timeout 10s bash -c ':> /dev/tcp/127.0.0.1/8761' || exit 1
+      interval: 20s
+      timeout: 10s
+      retries: 5
+  unique-uuid-api-1:
+    image: hurban/unique-uuid-api:latest
+    environment:
+      EUREKA__INSTANCE__IPADDRESS: "unique-uuid-api-1"
+    networks:
+      - app-network
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    ports:
+      - "8080:5273"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 100M
+        reservations:
+          cpus: '0.01'
+          memory: 50M
+  unique-uuid-api-2:
+    image: hurban/unique-uuid-api:latest
+    environment:
+      EUREKA__INSTANCE__IPADDRESS: "unique-uuid-api-2"
+    networks:
+      - app-network
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    ports:
+      - "8081:5273"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 100M
+        reservations:
+          cpus: '0.01'
+          memory: 50M
+  unique-uuid-api-3:
+    image: hurban/unique-uuid-api:latest
+    environment:
+      EUREKA__INSTANCE__IPADDRESS: "unique-uuid-api-3"
+    networks:
+      - app-network
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    ports:
+      - "8082:5273"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 100M
+        reservations:
+          cpus: '0.01'
+          memory: 50M
+  custom-load-balancer:
+    image: hurban/custom-alb:latest
+    environment:
+      SPRING_PROFILES_ACTIVE: "docker"
+    networks:
+      - app-network
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      unique-uuid-api-1:
+        condition: service_started
+      unique-uuid-api-2:
+        condition: service_started
+      unique-uuid-api-3:
+        condition: service_started    
+    ports:
+      - "8888:8888"
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,27 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: custom-load-balancer
+  cache:
+    type: none
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: catch-all
+          uri: no://op
+          predicates:
+            - Path=/**
+eureka:
+  client:
+    service-url:
+      defaultZone: "http://eureka-server:8761/eureka/"
+    fetch-registry: true
+    register-with-eureka: true
+
+
+
+

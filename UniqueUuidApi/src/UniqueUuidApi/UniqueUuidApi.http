@@ -1,0 +1,6 @@
+@UniqueUuidApi_HostAddress = http://localhost:5273
+
+GET {{UniqueUuidApi_HostAddress}}/id/
+Accept: application/json
+
+###
