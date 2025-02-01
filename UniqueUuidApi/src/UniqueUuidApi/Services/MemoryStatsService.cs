@@ -33,6 +33,19 @@ public class MemoryStatsService : IMemoryStatsService
         // Return the updated stats
         return GetMemoryStats();
     }
+    
+    public MemoryStatsDTO ConsumeMemory(int memoryUsed)
+    {
+        // Ensure memory usage does not exceed the limit
+        if (_usageMB + memoryUsed <= _limitMB)
+        {
+            _usageMB += memoryUsed;
+            _availableMB -= memoryUsed;
+        }
+
+        // Return the updated stats
+        return GetMemoryStats();
+    }
 
     public MemoryStatsDTO ReleaseMemory()
     {
