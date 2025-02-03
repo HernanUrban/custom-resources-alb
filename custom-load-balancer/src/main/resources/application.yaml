@@ -23,6 +23,14 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
 
-
+mem:
+  uri:
+    path: "/api/MemoryStats/MemoryStatus"
+session:
+  cookie:
+    name: "SELECTED_INSTANCE_ID"
+instance:
+  service:
+    name: "unique-uuid-api"
 
 

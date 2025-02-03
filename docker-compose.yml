@@ -18,6 +18,7 @@ services:
     image: hurban/unique-uuid-api:latest
     environment:
       EUREKA__INSTANCE__IPADDRESS: "unique-uuid-api-1"
+      EUREKA__INSTANCE__PORT: 5273
     networks:
       - app-network
     depends_on:
@@ -37,6 +38,7 @@ services:
     image: hurban/unique-uuid-api:latest
     environment:
       EUREKA__INSTANCE__IPADDRESS: "unique-uuid-api-2"
+      EUREKA__INSTANCE__PORT: 5273
     networks:
       - app-network
     depends_on:
@@ -56,6 +58,7 @@ services:
     image: hurban/unique-uuid-api:latest
     environment:
       EUREKA__INSTANCE__IPADDRESS: "unique-uuid-api-3"
+      EUREKA__INSTANCE__PORT: 5273
     networks:
       - app-network
     depends_on:
@@ -75,6 +78,9 @@ services:
     image: hurban/custom-alb:latest
     environment:
       SPRING_PROFILES_ACTIVE: "docker"
+      MEM_URI_PATH: "/api/MemoryStats/MemoryStatus"
+      SESSIOM_COOKIE_NAME: "SERVICE_INSTANCE_ID"
+      INSTANCE_SERVICE_NAME: "unique-uuid-api"
     networks:
       - app-network
     depends_on:

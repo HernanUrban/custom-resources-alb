@@ -1,5 +1,11 @@
 server:
   port: 8888
+logging:
+  level:
+    com:
+      urban:
+        poc:
+          loadbalancer: debug
 spring:
   application:
     name: custom-load-balancer

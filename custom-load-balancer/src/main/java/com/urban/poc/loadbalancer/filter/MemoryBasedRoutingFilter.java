@@ -3,6 +3,7 @@ package com.urban.poc.loadbalancer.filter;
 import com.urban.poc.loadbalancer.dto.MemoryStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -27,9 +28,17 @@ public class MemoryBasedRoutingFilter implements GlobalFilter, Ordered {
 
     private final DiscoveryClient discoveryClient;
     private final RestTemplate restTemplate;
-    private final String SESSION_COOKIE_NAME = "PREFERRED_INSTANCE";
+
     private final WebClient webClient = WebClient.builder().build();
 
+    @Value("${session.cookie.name:PREFERRED_INSTANCE_ID}")
+    private String SESSION_COOKIE_NAME;
+
+    @Value("${mem.uri.path:/api/memoryStats}")
+    private String MEMORY_STATS_PATH;
+
+    @Value("${instance.service.name:unique-uuid-app}")
+    private String INSTANCE_SERVICE_NAME;
 
     private final Logger logger = LoggerFactory.getLogger(MemoryBasedRoutingFilter.class);
     public MemoryBasedRoutingFilter(DiscoveryClient discoveryClient) {
@@ -47,9 +56,9 @@ public class MemoryBasedRoutingFilter implements GlobalFilter, Ordered {
             // Try to find the instance by its ID
             targetInstance = findInstanceById(instanceId);
             if (targetInstance != null) {
-                logger.info("Instance found {}", targetInstance.getInstanceId());
+                logger.debug("Instance found {}", targetInstance.getInstanceId());
             } else {
-                logger.info("Instance NOT found ");
+                logger.debug("Instance NOT found ");
                 targetInstance = selectTargetInstance();
             }
         } else {
@@ -64,7 +73,7 @@ public class MemoryBasedRoutingFilter implements GlobalFilter, Ordered {
             String targetUri = targetInstance.getUri().toString() + exchange.getRequest().getURI().getPath().replace("/unique-uuid-api", "");
             URI newUri = URI.create(targetUri);
 
-            logger.info("Routing request to instance ID {} and URI {}", targetInstance.getInstanceId(), newUri);
+            logger.debug("Routing request to instance ID {} and URI {}", targetInstance.getInstanceId(), newUri);
 
             exchange.getRequest().mutate().uri(newUri).build();
 
@@ -78,7 +87,7 @@ public class MemoryBasedRoutingFilter implements GlobalFilter, Ordered {
                     .uri(newUri)
                     .headers(headers -> headers.addAll(req.getHeaders()))
                     .exchangeToMono(clientResponse -> {
-                        logger.info("Received response with status {}", clientResponse.statusCode());
+                        logger.debug("Received response with status {}", clientResponse.statusCode());
                         return exchange.getResponse().writeWith(clientResponse.bodyToMono(DataBuffer.class));
                     })
                     .doOnError(error -> logger.error("Error forwarding request", error));
@@ -98,7 +107,7 @@ public class MemoryBasedRoutingFilter implements GlobalFilter, Ordered {
     }
 
     private ServiceInstance findInstanceById(String instanceId) {
-        return discoveryClient.getInstances("unique-uuid-api").stream()
+        return discoveryClient.getInstances(INSTANCE_SERVICE_NAME).stream()
                 .filter(instance -> instance.getInstanceId().equals(instanceId))
                 .findFirst()
                 .orElse(null);
@@ -112,7 +121,7 @@ public class MemoryBasedRoutingFilter implements GlobalFilter, Ordered {
 
     private long getAvailableMemory(ServiceInstance instance) {
         try {
-            String url = instance.getUri().toString() + "/api/MemoryStats/MemoryStatus";
+            String url = instance.getUri().toString() + MEMORY_STATS_PATH;
             ResponseEntity<MemoryStats> response = restTemplate.getForEntity(url, MemoryStats.class);
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
 
