@@ -29,6 +29,8 @@ mem:
 session:
   cookie:
     name: "SELECTED_INSTANCE_ID"
+    duration:
+      minutes: 60
 instance:
   service:
     name: "unique-uuid-api"

@@ -79,7 +79,8 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: "docker"
       MEM_URI_PATH: "/api/MemoryStats/MemoryStatus"
-      SESSIOM_COOKIE_NAME: "SERVICE_INSTANCE_ID"
+      SESSION_COOKIE_NAME: "SERVICE_INSTANCE_ID"
+      SESSION_COOKIE_DURATION_MINUTES: "1"
       INSTANCE_SERVICE_NAME: "unique-uuid-api"
     networks:
       - app-network

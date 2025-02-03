@@ -21,6 +21,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.Comparator;
 
 @Component
@@ -33,6 +34,9 @@ public class MemoryBasedRoutingFilter implements GlobalFilter, Ordered {
 
     @Value("${session.cookie.name:PREFERRED_INSTANCE_ID}")
     private String SESSION_COOKIE_NAME;
+
+    @Value("${session.cookie.duration.minutes:15}")
+    private String COOKIE_DURATION_MINUTES;
 
     @Value("${mem.uri.path:/api/memoryStats}")
     private String MEMORY_STATS_PATH;
@@ -138,6 +142,7 @@ public class MemoryBasedRoutingFilter implements GlobalFilter, Ordered {
         ResponseCookie cookie = ResponseCookie.from(SESSION_COOKIE_NAME, instance.getInstanceId())
                 .path("/")
                 .httpOnly(true)
+                .maxAge(Duration.ofMinutes(Long.valueOf(COOKIE_DURATION_MINUTES)))
                 .build();
         exchange.getResponse().addCookie(cookie);
     }
