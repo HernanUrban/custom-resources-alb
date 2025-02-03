@@ -12,10 +12,18 @@ Installed
 
 ## Build the projects
 You can build the projects separately or you can build them all at once via a script.  
-1. Build all at once
+1. Build all at once without OTEL integration
 ```bash
 ./build-all.sh
 ```
+
+Or  
+
+2. Build all at once with OTEL integration
+```bash
+./build-all.sh -otel
+```  
+
 This script will build all the projects and create the docker images. If everything worked fine you will see a message as follows: `All projects have been built and images have been created successfully!`.  
 
 ## Run the projects

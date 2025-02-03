@@ -4,7 +4,17 @@ services:
   eureka-server:
     image: hurban/discovery-service:latest
     environment:
-      - JAVA_TOOL_OPTIONS="-XX:-UseContainerSupport"
+      JAVA_TOOL_OPTIONS: "-XX:-UseContainerSupport"
+      #OpenTelemetry Config. Remove or change OTEL_SDK_DISABLED to false.
+      OTEL_SDK_DISABLED: true
+      OTEL_TRACES_SAMPLER: always_on
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_SERVICE_NAME: eureka-server
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector:4317
+      OTEL_PROPAGATORS: tracecontext,baggage,
     networks:
       - app-network
     ports:
@@ -82,6 +92,16 @@ services:
       SESSION_COOKIE_NAME: "SERVICE_INSTANCE_ID"
       SESSION_COOKIE_DURATION_MINUTES: "1"
       INSTANCE_SERVICE_NAME: "unique-uuid-api"
+      #OpenTelemetry Config. Remove or change OTEL_SDK_DISABLED to false.
+      OTEL_SDK_DISABLED: true
+      OTEL_TRACES_SAMPLER: always_on
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_SERVICE_NAME: custom-load-balancer
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector:4317
+      OTEL_PROPAGATORS: tracecontext,baggage,
     networks:
       - app-network
     depends_on:

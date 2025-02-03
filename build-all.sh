@@ -19,10 +19,10 @@ guard "UniqueUuidApi build and docker image" ./docker-build.sh
 cd ${BASEDIR}
 echo "-= Service Discovery =- "
 cd service-discovery/
-guard "service-discovery build and docker image" ./docker-build.sh
+guard "service-discovery build and docker image" ./docker-build.sh $1
 cd ${BASEDIR}
 echo "-= Custom Load Balancer =-"
  cd custom-load-balancer
-guard "scustom-load-balancer build and docker image" ./docker-build.sh
+guard "scustom-load-balancer build and docker image" ./docker-build.sh $1
 cd ${BASEDIR}
 echo "All projects have been built and images have been created successfully!"
