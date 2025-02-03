@@ -114,7 +114,7 @@ public class MemoryBasedRoutingFilter implements GlobalFilter, Ordered {
     }
 
     private ServiceInstance selectTargetInstance() {
-        return discoveryClient.getInstances("unique-uuid-api").stream()
+        return discoveryClient.getInstances(INSTANCE_SERVICE_NAME).stream()
                 .max(Comparator.comparing(this::getAvailableMemory))
                 .orElse(null);
     }
